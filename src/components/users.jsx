@@ -1,68 +1,55 @@
 import React, { useState } from "react";
-import api from "../api";
+import { paginate } from "../utils/paginate";
+import Pagination from "./pagination";
+import User from "./user";
+import PropTypes from "prop-types";
 
-const Users = () => {
-  const [users, setUsers] = useState(api.users.fetchAll());
+const Users = ({ users, ...rest }) => {
+    const count = users.length;
+    const pageSize = 4;
+    const [currentPage, setCurrentPage] = useState(1);
+    const handlePageChange = (pageIndex) => {
+        setCurrentPage(pageIndex);
+    };
 
-  const handleDelete = (userId) => {
-    setUsers((prevState) => prevState.filter((user) => user._id !== userId));
-  };
+    const userCrop = paginate(users, currentPage, pageSize);
 
-  const renderPhrase = (number) => {
-    return number >= 2 && number <= 4
-      ? `${number} человека тусанет с тобой сегодня`
-      : number === 1
-      ? `${number} человек тусанет с тобой сегодня`
-      : `${number} человек тусанут с тобой сегодня`;
-  };
+    return (
+        <>
+            <table className="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Качества</th>
+                        <th scope="col">Профессия</th>
+                        <th scope="col">Встретился,раз</th>
+                        <th scope="col">Оценка</th>
+                        <th scope="col">Избранное</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {userCrop.map((user) => (
+                        <User
+                            key={user._id}
+                            {...user}
+                            onDelete={rest.onDelete}
+                        />
+                    ))}
+                </tbody>
+            </table>
+            <Pagination
+                itemsCount={count}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+            />
+        </>
+    );
+};
 
-  return (
-    <>
-      <h2>
-        <span class={`badge bg-${users.length === 0 ? "danger" : "info"}`}>
-          {renderPhrase(users.length)}
-        </span>
-      </h2>
-
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">Имя</th>
-            <th scope="col">Качества</th>
-            <th scope="col">Профессия</th>
-            <th scope="col">Встретился,раз</th>
-            <th scope="col">Оценка</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr>
-              <td>{user.name}</td>
-              <td>
-                {user.qualities.map((qualitie) => (
-                  <span class={`btn m-1 btn-${qualitie.color}`}>
-                    {qualitie.name}
-                  </span>
-                ))}
-              </td>
-              <td>{user.profession.name}</td>
-              <td>{user.completedMeetings}</td>
-              <td>{user.rate}</td>
-              <td>
-                <button
-                  className="bth btn-danger"
-                  onClick={() => handleDelete(user._id)}
-                >
-                  delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
-  );
+Users.propTypes = {
+    users: PropTypes.array.isRequired
 };
 
 export default Users;
