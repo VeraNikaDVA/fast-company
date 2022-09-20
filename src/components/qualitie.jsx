@@ -1,7 +1,18 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-const qualitie = (qualitie) => {
-  return <span class={`btn m-1 btn-${qualitie.color}`}>{qualitie.name}</span>;
+const qualitie = ({ color, name, _id }) => {
+    return (
+        <span key={_id} className={`btn m-1 btn-${color}`}>
+            {name}
+        </span>
+    );
+};
+
+qualitie.propTypes = {
+    color: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    _id: PropTypes.string.isRequired
 };
 
 export default qualitie;
