@@ -9,7 +9,10 @@ const user = ({
     profession,
     completedMeetings,
     rate,
-    onDelete
+    onDelete,
+    bookmark,
+    onBookmark,
+    userId
 }) => {
     return (
         <>
@@ -24,12 +27,16 @@ const user = ({
                 <td>{completedMeetings}</td>
                 <td>{rate}</td>
                 <td>
-                    <Bookmark />
+                    <Bookmark
+                        status={bookmark}
+                        handleBookmark={onBookmark}
+                        userId={userId}
+                    />
                 </td>
                 <td>
                     <button
                         className="btn btn-danger"
-                        onClick={() => onDelete(user._id)}
+                        onClick={() => onDelete(userId)}
                     >
                         Delete
                     </button>
@@ -45,7 +52,9 @@ user.propTypes = {
     profession: PropTypes.object.isRequired,
     completedMeetings: PropTypes.number.isRequired,
     rate: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
+    onBookmark: PropTypes.func.isRequired,
+    userId: PropTypes.string.isRequired
 };
 
 export default user;
