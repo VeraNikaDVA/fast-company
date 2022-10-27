@@ -7,12 +7,14 @@ import api from "../api";
 import SearchStatus from "./searchStatus";
 import UserTable from "./usersTable";
 import _ from "lodash";
+import TextField from "./textField";
 
 const UsersList = () => {
     const [professions, setProfession] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProf, setSelectedProf] = useState();
-    const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
+    const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
+    const [searchString, setSearchString] = useState("");
     const pageSize = 4;
 
     const [users, setUsers] = useState();
@@ -66,6 +68,7 @@ const UsersList = () => {
 
     const handleProfessionSelect = (item) => {
         setSelectedProf(item);
+        setSearchString("");
     };
 
     const handlePageChange = (pageIndex) => {
@@ -75,12 +78,27 @@ const UsersList = () => {
     const handleSort = (item) => {
         setSortBy(item);
     };
+
+    const handleSearch = ({ target }) => {
+        setSearchString(target.value);
+        setSelectedProf(undefined);
+    };
     if (users) {
         const filteredUsers = selectedProf
             ? users.filter((user) => user.profession._id === selectedProf._id)
             : users;
-        const count = filteredUsers.length;
-        const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]);
+        const searchedUsers = searchString
+            ? users.filter((user) => user.name.toLowerCase().indexOf(searchString.toLowerCase()) >= 0)
+            : users;
+        const count = selectedProf
+            ? filteredUsers.length
+            : searchedUsers.length;
+        const sortedUsers = _.orderBy(selectedProf
+            ? filteredUsers
+            : searchedUsers,
+        [sortBy.path],
+        [sortBy.order]
+        );
         const usersCrop = paginate(sortedUsers, currentPage, pageSize);
         const clearFilter = () => {
             setSelectedProf();
@@ -88,10 +106,8 @@ const UsersList = () => {
 
         return (
             <div className = "d-flex">
-
                 {professions && (
                     <div className="d-flex flex-column flex-shrink-0 p-3">
-
                         <GroupList
                             selectedItem = {selectedProf}
                             items = {professions}
@@ -102,6 +118,12 @@ const UsersList = () => {
                 )}
                 <div className="d-flex flex-column">
                     <SearchStatus length={count} />
+                    <TextField
+                        name="search"
+                        placeholder="Search..."
+                        value={searchString}
+                        onChange={handleSearch}
+                    />
                     <UserTable
                         users={usersCrop}
                         onSort={handleSort}
