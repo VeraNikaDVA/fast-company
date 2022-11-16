@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
-import api from "../api";
-import QualitiesList from "./qualitiesList";
+import api from "../../../api";
+import Qualities from "../../ui/qualities";
 
 const UserPage = ({ id }) => {
     const [user, setUser] = useState();
@@ -12,22 +12,22 @@ const UserPage = ({ id }) => {
                 data
             )
         );
-    });
+    }, []);
     const history = useHistory();
     return <>
         {user
             ? <>
                 <h1>{user.name}</h1>
                 <h2>{`Профессия: ${user.profession.name}`}</h2>
-                <QualitiesList qualities={user.qualities}/>
+                <Qualities qualities={user.qualities}/>
                 <h2>{`Встретился ${user.completedMeetings} раз`}</h2>
                 <h2>{`Оценка: ${user.rate}/5`}</h2>
                 <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => history.push("/users")}
+                    onClick={() => history.push(`/users/${id}/edit`)}
                 >
-                    Все пользователи
+                    Изменить
                 </button>
             </>
             : <h1>Loading ...</h1>
